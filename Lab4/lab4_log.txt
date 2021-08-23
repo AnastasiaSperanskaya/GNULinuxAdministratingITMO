@@ -1,0 +1,88 @@
+#1
+dnf groupinstall "Development Tools"
+
+#2
+mkdir bastet
+cd bastet
+smbclient //192.168.1.49/linux_install
+get bastet-0.43.tgz
+quit
+
+tar -xzvf bastet-0.43.tgz
+make
+yum install boost-devel
+yum install ncurses-devel ncurses
+make
+./bastet
+
+vi Makefile
+"install:
+	install ./bastet /usr/bin"
+
+make install
+
+#3
+dnf list installed > task3.log
+
+#4
+yum deplist gcc > task4_1.log
+rpm -q --whatrequires libgcc > task4_2.log
+
+#5
+mkdir localrepo
+cd localrepo
+smbclient //192.168.1.49/linux_install
+get checkinstall-1.6.2-3.el6.1.x86_64.rpm
+quit
+
+yum install createrepo
+cd /etc/yum.repos.d
+touch localrepo.repo
+vi localrepo.repo
+"[localrepo]
+ name=localrepo
+ baseurl=file:///root/localrepo/
+ enabled=1
+ gpgcheck=0"
+createrepo /root/localrepo
+
+#6
+yum repolist all > task6.log
+
+#7
+cd /etc/yum.repos.d/
+for f in *; do mv "$f" "$(echo "$f" | sed s/repo/rep/)"; done
+mv localrepo.rep localrepo.repo
+yum list available
+rpm -i checkinstall-1.6.2-3.el6.1.x86_64.rpm
+
+#8
+smbclient //192.168.1.49/linux_install
+get fortunes-ru_1.52-2_all.deb
+quit
+
+yum install wget
+wget -c https://sourceforge.net/projects/alien-pkg-convert/files/release/alien_8.95.tar.xz
+tar xf alien_8.95.tar.xz
+dnf install perl
+cd alien-8.95
+perl Makefile.PL; make; make install
+
+alien —to-rpm —scripts ./fortunes-ru_1.52-2_all.deb
+rpm -i fortunes-ru_1.52-2_all.rpm
+
+#9
+dnf download nano
+
+dnf install https://extras.getpagespeed.com/release-el8-latest.rpm
+dnf install rpmrebuild
+
+rpmrebuild -enp nano-2.9.8-1.el8.x86_64.rpm
+"Version: 2.9.8_newnano
+...
+%post
+...
+mv /usr/bin/nano /usr/bin/newnano"
+cd rpmbuild/RPMS/x86_64/
+yum remove nano
+rpm -i nano-2.9.8_newnano-1.el8.x86_64.rpm

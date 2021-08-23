@@ -1,0 +1,1 @@
+This repo contains all data associated with 3-rd year ITMO GNU Linux Administrating course

@@ -1,0 +1,86 @@
+#1
+dnf groupinstall "Development Tools"
+
+#2
+mount -t cifs //192.168.1.114/share /mnt/share -o username=anastasiasperanskaa,password=5283,vers=1.0,nounix,sec=ntlmssp
+
+cd /mnt/share
+
+mkdir /root/bastet
+cp bastet-0.43.tgz /root/bastet
+cp checkinstall-1.6.2-3.el6.1.x86_64.rpm /root
+cp fortunes-ru_1.52-2_all.deb /root
+
+cd ~
+yum install boost-devel
+yum install ncurses-devel ncurses
+cd bastet
+tar -xzvf bastet-0.43.tgz
+cd bastet-0.43
+make
+./bastet
+
+vi Makefile
+#install:
+#	install ./bastet /usr/bin
+make install
+
+su - u1
+#12345678
+cd /usr/bin
+./bastet
+su - root
+#rootroot
+cd ~
+
+#3
+dnf list installed > task3.log
+
+#4
+yum deplist gcc > task4_1.log
+rpm -q --whatrequires libgcc > task4_2.log
+
+#5
+yum install createrepo
+mkdir localrepo
+mv checkinstall-1.6.2-3.el6.1.x86_64.rpm /root/localrepo
+cd /etc/yum.repos.d
+touch localrepo.repo
+vi localrepo.repo
+#[localrepo]
+#name=localrepo
+#baseurl=file::///root/localrepo/
+#enabled=1
+#gpgcheck=0
+createrepo /root/localrepo
+cd ~
+
+#6
+yum repolist all > task6.log
+
+#7
+cd /etc/yum.repos.d/
+for f in *; do mv "$f" "$(echo "$f" | sed s/repo/rep/)"; done
+mv localrepo.rep localrepo.repo
+yum list available
+cd ~/localrepo/
+dnf install checkinstall-1.6..2-3.el6.1.x86_64.rpm
+
+#8
+tar -xf /mnt/share/alien_8.95.tar.xz -C /root/ 
+dnf install perl
+cd /root/
+cd alien-8.95
+perl Makefile.PL; make; make install
+cd ~
+alien --to-rpm ~/fortunes-ru_1.52-2_all.deb
+rpm -i --force fortunes-ru-1.52-3_all.noarch.rpm
+
+#9
+dnf download nano
+dnf install https://extras.getpagespeed.com/release-el8-latest.rpm
+dnf install rpmbuild
+rpmrebuild -enp nano-2.9.8-1.el8.x86_64.rpm
+cd /root/rpmbuild/RPMS/x86_64/
+yum remove nano
+rpm -i nano-2.9.8_newnano-1.el8.x86_64.rpm

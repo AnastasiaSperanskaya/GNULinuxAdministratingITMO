@@ -1,0 +1,13 @@
+--- man.txt	2020-10-09 09:00:20.403404007 +0300
++++ man.dir/man.txt	2020-10-09 09:00:20.396404007 +0300
+@@ -1,5 +1,3 @@
+-a few symbols in the beginning
+-a few symbols more
+ MAN(1)                                  Manual pager utils                                 MAN(1)
+ 
+ NAME
+@@ -620,4 +618,3 @@
+        maintaining man-db.
+ 
+ 2.7.6.1                                     2016-12-12                                     MAN(1)
+-a few symbols in the end
